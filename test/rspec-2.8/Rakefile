@@ -1,0 +1,87 @@
+require 'common_test'
+
+task :default => :test
+
+desc "Run tests"
+task :test do
+  require './passing_test'
+
+  RSpec::Core::Runner.disable_autorun!
+
+  reset_state # pass-through run
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  load './passing_test.rb'
+  RSpec::Core::Runner.run []
+  test_state(true, true, true)
+
+  reset_state # stop on run
+  CommonTest.on_run do |context|
+    # do nothing this time
+  end
+  load './passing_test.rb'
+  RSpec::Core::Runner.run []
+  test_state(false, false, false)
+
+  reset_state # pt run. stop on suite
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    # do nothing this time
+  end
+  load './passing_test.rb'
+  RSpec::Core::Runner.run []
+  test_state(true, false, false)
+
+  reset_state # pt run, suite. stop on run
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    $run = true
+    puts "before suite"
+    result = context.next
+    puts "after suite"
+  end
+  CommonTest.on_test do |context|
+    puts "ON TEST!"
+    # do nothing
+  end
+  load './passing_test.rb'
+  RSpec::Core::Runner.run []
+  test_state(true, true, false)
+
+  reset_state
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_test do |context|
+    $run = true
+    result = context.next
+  end
+  load './passing_test.rb'
+  RSpec::Core::Runner.run []
+  test_state(true, true, true)
+end
+
+def test_state(*states)
+  raise "weird number of states" unless states.size == 3
+  [$run, $suite, $test] == states or
+    raise "Excepted #{states.inspect}, got #{[$run, $suite, $test].inspect}"
+end
+
+def reset_state
+  RSpec.reset
+  CommonTest.reset!
+  $run, $suite, $test = false, false, false
+end

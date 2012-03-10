@@ -1,0 +1,78 @@
+require 'common_test'
+
+task :default => :test
+
+desc "Run tests"
+task :test do
+  require './passing_test'
+
+  reset_state
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  require './passing_test'
+  MiniTest::Unit.new.run
+  test_state(true, true, true)
+
+  reset_state
+  CommonTest.on_run do |context|
+    # do nothing this time
+  end
+  MiniTest::Unit.new.run
+  test_state(false, false, false)
+
+  reset_state
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    # do nothing this time
+  end
+  MiniTest::Unit.new.run
+  test_state(true, false, false)
+
+  reset_state
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_test do |context|
+    # do nothing
+  end
+  MiniTest::Unit.new.run
+  test_state(true, true, false)
+
+  reset_state
+  CommonTest.on_run do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_suite do |context|
+    $run = true
+    result = context.next
+  end
+  CommonTest.on_test do |context|
+    $run = true
+    result = context.next
+  end
+  MiniTest::Unit.new.run
+  test_state(true, true, true)
+end
+
+def test_state(*states)
+  raise "weird number of states" unless states.size == 3
+  [$run, $suite, $test] == states or
+    raise "Excepted #{states.inspect}, got #{[$run, $suite, $test].inspect}"
+end
+
+def reset_state
+  MiniTest::Unit.runner = nil
+  CommonTest.reset!
+  $run, $suite, $test = false, false, false
+end

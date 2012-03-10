@@ -1,0 +1,44 @@
+class Test
+  def []=(key, val, opts = {})
+    puts "key: #{key} val: #{val.inspect} #{opts.inspect}"
+  end
+end
+
+
+# TestDispatch
+
+TestDispatch.register(name, suite)
+
+# for event emitting
+
+TestDispatch.dispatch_run(running_instance)
+yields when ready to continue
+
+TestDispatch.dispatch_suite(name)
+yields when ready to continue
+
+TestDispatch.dispatch_test(*ids) 
+yields when ready to continue
+
+describe Blah
+  it "should do things" do
+  end
+end
+
+TestDispatch.dispatch_test { |*ids|
+  if test_should_run?
+    yield
+  else
+    puts "Not running #{ids.join(', ')}"
+  end
+}
+
+class Spectator
+  # on_run(runner, next)
+  # on_test(test_context, next)
+  # on_suite(suite_context, next)
+end
+
+#on_run
+#on_suite
+#on_test

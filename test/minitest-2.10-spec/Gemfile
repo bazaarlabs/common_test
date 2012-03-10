@@ -1,0 +1,5 @@
+source :rubygems
+
+gem 'minitest', '~> 2.10.0'
+gem 'common_test', :path => '../..'
+gem 'rake'
