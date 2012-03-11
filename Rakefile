@@ -7,6 +7,7 @@ namespace :test do
   desc "Test adapters"
   task :adapters do
     Dir['test/*'].each do |dir|
+      next if File.basename(dir)[0] == ?_
       if ENV['DIR_TEST']
         File.basename(dir) == ENV['DIR_TEST'] or next
       end

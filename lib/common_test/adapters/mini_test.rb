@@ -1,38 +1,28 @@
 module CommonTest
   module Adapters
     module MiniTest
-      def self.install
+      def self.install(_manager)
         if Kernel.const_defined?(:MiniTest)
           ::MiniTest::Unit.class_eval do
             # run
             unless method_defined?(:_original_run)
               alias_method :_original_run, :run
-              def run(args = [])
-                CommonTest.instance.dispatch_run(self) {
-                  _original_run(args)
-                }
+              define_method(:run) do |*args|
+                _manager.dispatch_run(self) do
+                  _original_run(*args)
+                end
               end
             end
           end
 
           ::MiniTest::Unit::TestCase.class_eval do
-            # suite
+            # test
             unless method_defined?(:_original_run)
               alias_method :_original_run, :run
-              def run(runner)
-                CommonTest.instance.dispatch_suite(self.__name__, :instance => self) {
-                  _original_run(runner)
-                }
-              end
-            end
-
-            # test
-            unless method_defined?(:_original_run_test)
-              alias_method :_original_run_test, :run_test
-              def run_test(name)
-                CommonTest.instance.dispatch_test(name, :instance => self) {
-                  _original_run_test(name)
-                }
+              define_method(:run) do |*args|
+                _manager.dispatch_test([self.__name__], :instance => self) do
+                  _original_run(*args)
+                end
               end
             end
           end

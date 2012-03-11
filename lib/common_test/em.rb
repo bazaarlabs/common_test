@@ -5,8 +5,12 @@ module CommonTest
     end
 
     def on_test(context)
-      ::EM.run do
-        EM.add_timer(@time_to_wait) { EM.stop } if @time_to_wait
+      EventMachine.run do
+        if @time_to_wait
+          EventMachine.add_timer(@time_to_wait) do
+            EventMachine.stop
+          end
+        end
         context.next
       end
     end

@@ -1,6 +1,7 @@
-require "common_test/version"=
+require "common_test/version"
 require "common_test/registration"
 require "common_test/dispatching"
+require "common_test/manager"
 require "common_test/adapters/mini_test"
 require "common_test/adapters/rspec"
 require "common_test/em"

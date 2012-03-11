@@ -4,75 +4,56 @@ task :default => :test
 
 desc "Run tests"
 task :test do
-  require './passing_test'
+  require File.expand_path("../../_common/minitest/passing_spec.rb", __FILE__)
 
   reset_state
   CommonTest.on_run do |context|
-    $run = true
+    $run += 1
     result = context.next
   end
-  require './passing_test'
   MiniTest::Unit.new.run
-  test_state(true, true, true)
+  test_state(1, 2)
 
   reset_state
   CommonTest.on_run do |context|
     # do nothing this time
   end
   MiniTest::Unit.new.run
-  test_state(false, false, false)
+  test_state(0, 0)
 
   reset_state
   CommonTest.on_run do |context|
-    $run = true
-    result = context.next
-  end
-  CommonTest.on_suite do |context|
-    # do nothing this time
-  end
-  MiniTest::Unit.new.run
-  test_state(true, false, false)
-
-  reset_state
-  CommonTest.on_run do |context|
-    $run = true
-    result = context.next
-  end
-  CommonTest.on_suite do |context|
-    $run = true
+    $run += 1
     result = context.next
   end
   CommonTest.on_test do |context|
-    # do nothing
+    result = context.next
   end
   MiniTest::Unit.new.run
-  test_state(true, true, false)
+  test_state(1, 2)
 
   reset_state
   CommonTest.on_run do |context|
-    $run = true
-    result = context.next
-  end
-  CommonTest.on_suite do |context|
-    $run = true
+    $run += 1
     result = context.next
   end
   CommonTest.on_test do |context|
-    $run = true
-    result = context.next
+    if context.name =~ /good2/
+      result = context.next
+    end
   end
   MiniTest::Unit.new.run
-  test_state(true, true, true)
+  test_state(1, 1)
 end
 
 def test_state(*states)
-  raise "weird number of states" unless states.size == 3
-  [$run, $suite, $test] == states or
-    raise "Excepted #{states.inspect}, got #{[$run, $suite, $test].inspect}"
+  raise "weird number of states" unless states.size == 2
+  [$run, $test] == states or
+    raise "Excepted #{states.inspect}, got #{[$run, $test].inspect}"
 end
 
 def reset_state
   MiniTest::Unit.runner = nil
   CommonTest.reset!
-  $run, $suite, $test = false, false, false
+  $run, $test = 0, 0
 end

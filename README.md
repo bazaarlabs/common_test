@@ -24,17 +24,11 @@ Then, require your gem:
 
 ## Interface
 
-CommonTest gives you three points of injection; at the entire test run level, the "suite" level and per-test.
+CommonTest gives you three points of injection; at the entire test run level and per-test.
 
 To use it on the test run level, use:
 
     CommonTest.on_run do |context|
-      # ...
-    end
-
-To use it on the suite level, use:
-
-    CommonTest.on_suite do |context|
       # ...
     end
 
