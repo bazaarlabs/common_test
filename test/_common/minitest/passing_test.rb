@@ -1,5 +1,5 @@
 require 'minitest/unit'
-require 'common_test/auto'
+require File.expand_path("../test_helper", __FILE__)
 
 class PassingTest < MiniTest::Unit::TestCase
   def test_good

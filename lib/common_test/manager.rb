@@ -1,6 +1,8 @@
 module CommonTest
   class Manager
     module Context
+      attr_reader :instance
+
       def next
         @next.call
       end
@@ -8,14 +10,17 @@ module CommonTest
       def on_next(&blk)
         @next = blk
       end
+
+      def execute(&blk)
+        instance.instance_exec(self, &blk)
+      end
     end
 
     class RunContext
       include Context
-      attr_reader :runner
 
-      def initialize(runner, opts)
-        @runner = runner
+      def initialize(instance, opts)
+        @instance = instance
       end
     end
 
@@ -23,9 +28,9 @@ module CommonTest
       include Context
       attr_reader :ids
 
-      def initialize(ids, opts)
+      def initialize(instance, ids, opts)
+        @instance, @ids = instance, ids
         @ids = ids
-        @instance = opts && opts[:instance]
       end
 
       def name
@@ -60,13 +65,13 @@ module CommonTest
       @test_hooks << (hook || blk)
     end
 
-    def dispatch_run(runner, opts = nil, &blk)
+    def dispatch_run(obj, opts = nil, &blk)
       i = 0
-      run_context = RunContext.new(runner, opts)
+      run_context = RunContext.new(obj, opts)
       run_context.on_next do
         if i < @run_hooks.size
           i += 1
-          @run_hooks.at(i - 1).call(run_context)
+          obj.instance_exec(run_context, &@run_hooks.at(i - 1))
         else
           yield
         end
@@ -74,13 +79,13 @@ module CommonTest
       run_context.next
     end
 
-    def dispatch_test(name, opts = nil, &blk)
+    def dispatch_test(obj, name, opts = nil, &blk)
       i = 0
-      test_context = TestContext.new(name, opts)
+      test_context = TestContext.new(obj, name, opts)
       test_context.on_next do
         if i < @test_hooks.size
           i += 1
-          @test_hooks.at(i - 1).call(test_context)
+          test_context.execute(&@test_hooks.at(i - 1))
         else
           yield
         end

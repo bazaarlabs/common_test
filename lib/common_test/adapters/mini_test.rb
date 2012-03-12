@@ -20,7 +20,7 @@ module CommonTest
             unless method_defined?(:_original_run)
               alias_method :_original_run, :run
               define_method(:run) do |*args|
-                _manager.dispatch_test([self.__name__], :instance => self) do
+                _manager.dispatch_test(self, [self.__name__]) do
                   _original_run(*args)
                 end
               end

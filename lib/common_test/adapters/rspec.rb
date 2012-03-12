@@ -1,15 +1,16 @@
 module CommonTest
   module Adapters
     module RSpec
-      def self.install(manager)
+      def self.install(_manager)
         if Kernel.const_defined?(:RSpec)
           ::RSpec::Core::Runner.class_eval do
+            @@_manager = _manager
             class << self
               # run
               unless method_defined?(:_original_run)
                 alias_method :_original_run, :run
-                def run(*args)
-                  CommonTest.instance.dispatch_run(self) {
+                define_method(:run) do |*args|
+                  @@_manager.dispatch_run(self) {
                     _original_run(*args)
                   }
                 end
@@ -20,14 +21,14 @@ module CommonTest
           ::RSpec::Core::Example.class_eval do
             unless method_defined?(:_original_run)
               alias_method :_original_run, :run
-              def run(*args)
+              define_method(:run) do |example_group_instance, *args|
                 original_block = @example_block
                 @example_block = proc do
-                  CommonTest.instance.dispatch_test([@description], :instance => self) do
+                  _manager.dispatch_test(self, [self.class.description, example.metadata[:description]]) do
                     original_block.call
                   end
                 end
-                _original_run(*args)
+                _original_run(example_group_instance, *args)
               end
             end
           end

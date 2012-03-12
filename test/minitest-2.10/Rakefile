@@ -1,59 +1,14 @@
 require 'common_test'
+$: << File.expand_path("../../_common", __FILE__)
+
+require 'lib/testcase'
+
+require "minitest/passing_test"
 
 task :default => :test
 
 desc "Run tests"
 task :test do
-  require File.expand_path("../../_common/minitest/passing_test.rb", __FILE__)
-
-  reset_state
-  CommonTest.on_run do |context|
-    $run += 1
-    result = context.next
-  end
-  MiniTest::Unit.new.run
-  test_state(1, 2)
-
-  reset_state
-  CommonTest.on_run do |context|
-    # do nothing this time
-  end
-  MiniTest::Unit.new.run
-  test_state(0, 0)
-
-  reset_state
-  CommonTest.on_run do |context|
-    $run += 1
-    result = context.next
-  end
-  CommonTest.on_test do |context|
-    result = context.next
-  end
-  MiniTest::Unit.new.run
-  test_state(1, 2)
-
-  reset_state
-  CommonTest.on_run do |context|
-    $run += 1
-    result = context.next
-  end
-  CommonTest.on_test do |context|
-    if context.name =~ /good2/
-      result = context.next
-    end
-  end
-  MiniTest::Unit.new.run
-  test_state(1, 1)
+  MinitestTestcase.new.run
 end
 
-def test_state(*states)
-  raise "weird number of states" unless states.size == 2
-  [$run, $test] == states or
-    raise "Excepted #{states.inspect}, got #{[$run, $test].inspect}"
-end
-
-def reset_state
-  MiniTest::Unit.runner = nil
-  CommonTest.reset!
-  $run, $test = 0, 0
-end
