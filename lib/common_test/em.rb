@@ -1,5 +1,5 @@
 module CommonTest
-  module EM
+  class EM
     def initialize(opts)
       @time_to_wait = opts && opts[:time_to_wait]
     end

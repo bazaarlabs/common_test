@@ -1,5 +1,5 @@
 module CommonTest
-  module Multi
+  class Multi
     def initialize(number_of_cores)
       @number_of_cores = number_of_cores
     end
