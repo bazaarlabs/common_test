@@ -9,6 +9,6 @@ task :default => :test
 
 desc "Run tests"
 task :test do
-  MinitestTestcase.new.run
+  MinitestTestcase.new.run(:minitest?)
 end
 

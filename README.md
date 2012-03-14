@@ -6,6 +6,7 @@ Have you ever wanted to inject some piece of code into your tests, or have a lib
 
 * Minitest 2.10, 2.11
 * RSpec 2.8
+* UnitTest 2.4
 
 ## Usage
 
@@ -39,3 +40,11 @@ To use it on the per-test level, use:
     end
 
 You can call into the next test by calling `.next` on the context object.
+
+## Included test middleware
+
+### Eventmachine
+
+* CommonTest.use CommonTest::EventMachine
+
+Wraps all tests in EM.run

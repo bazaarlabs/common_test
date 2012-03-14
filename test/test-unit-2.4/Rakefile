@@ -3,12 +3,12 @@ $: << File.expand_path("../../_common", __FILE__)
 
 require 'lib/testcase'
 
-require "rspec/passing_test"
+require "testunit/passing_test"
 
 task :default => :test
 
 desc "Run tests"
 task :test do
-  RSpecTestcase.new.run(:rspec?)
+  TestUnitTestcase.new.run(:testunit?)
 end
 

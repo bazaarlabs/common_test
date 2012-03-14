@@ -10,7 +10,7 @@ module CommonTest
               unless method_defined?(:_original_run)
                 alias_method :_original_run, :run
                 define_method(:run) do |*args|
-                  @@_manager.dispatch_run(self) {
+                  @@_manager.dispatch_run(self, :type => :rspec, :version => VERSION) {
                     _original_run(*args)
                   }
                 end
@@ -24,7 +24,10 @@ module CommonTest
               define_method(:run) do |example_group_instance, *args|
                 original_block = @example_block
                 @example_block = proc do
-                  _manager.dispatch_test(self, [self.class.description, example.metadata[:description]]) do
+                  _manager.dispatch_test(self,
+                    [self.class.description, example.metadata[:description]],
+                    :type => :rspec, :version => VERSION
+                  ) do
                     original_block.call
                   end
                 end

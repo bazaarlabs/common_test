@@ -1,0 +1,5 @@
+source :rubygems
+
+gem 'test-unit', '~> 2.4.8'
+gem 'common_test', :path => '../..'
+gem 'rake'

@@ -4,6 +4,7 @@ require "common_test/dispatching"
 require "common_test/manager"
 require "common_test/adapters/mini_test"
 require "common_test/adapters/rspec"
+require "common_test/adapters/test_unit"
 require "common_test/em"
 require "common_test/mute"
 

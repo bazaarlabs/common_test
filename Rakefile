@@ -1,7 +1,12 @@
 require "bundler/gem_tasks"
+require 'rake/testtask'
+require 'yard'
+
 include Rake::DSL
 
 STDOUT.sync = true
+
+task :default => :test
 
 namespace :test do
   desc "Test adapters"
@@ -30,7 +35,19 @@ namespace :test do
       end
     end
   end
+
+  #desc "Test modules"
+  #Rake::TestTask.new(:modules) do |t|
+  #  t.libs.push "lib"
+  #  t.test_files = FileList[File.expand_path("../test/_modules/**/*_test.rb", __FILE__)]
+  #  t.verbose = true
+  #end
 end
 
 desc "Run all tests"
 task :test => %w(test:adapters)
+
+ROOT = File.expand_path(File.dirname(__FILE__))
+
+
+

@@ -1,5 +1,5 @@
 class Testcase
-  def run
+  def run(type_method)
     reset_state
     CommonTest.on_run do |context|
       $run += 1
@@ -17,22 +17,28 @@ class Testcase
 
     reset_state
     CommonTest.on_run do |context|
-      $run += 1
-      result = context.next
+      if context.send(type_method)
+        $run += 1
+        result = context.next
+      end
     end
     CommonTest.on_test do |context|
-      result = context.next
+      if context.send(type_method)
+        result = context.next
+      end
     end
     run_tests
     test_state(1, 2)
 
     reset_state
     CommonTest.on_run do |context|
-      $run += 1
-      result = context.next
+      if context.send(type_method)
+        $run += 1
+        result = context.next
+      end
     end
     CommonTest.on_test do |context|
-      if context.name =~ /good2/
+      if context.send(type_method) && context.name =~ /good2/
         result = context.next
       end
     end
@@ -72,5 +78,16 @@ class RSpecTestcase < Testcase
     super
     RSpec.reset
     load File.expand_path('../../rspec/passing_test.rb', __FILE__)
+  end
+end
+
+class TestUnitTestcase < Testcase
+  def run_tests
+    Test::Unit::AutoRunner.run
+  end
+
+  def reset_state
+    super
+    load File.expand_path('../../testunit/passing_test.rb', __FILE__)
   end
 end

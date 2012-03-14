@@ -1,7 +1,16 @@
 module CommonTest
   class Manager
-    module Context
-      attr_reader :instance
+    class Context
+      attr_reader :instance, :version
+
+      def process_opts(opts)
+        @type = opts && opts[:type]
+        @version = opts && opts[:version]
+      end
+
+      [:rspec, :minitest, :testunit].each do |type|
+        define_method("#{type}?") { @type == type }
+      end
 
       def next
         @next.call
@@ -16,21 +25,20 @@ module CommonTest
       end
     end
 
-    class RunContext
-      include Context
-
+    class RunContext < Context
       def initialize(instance, opts)
         @instance = instance
+        process_opts(opts)
       end
     end
 
-    class TestContext
-      include Context
+    class TestContext < Context
       attr_reader :ids
 
       def initialize(instance, ids, opts)
         @instance, @ids = instance, ids
         @ids = ids
+        process_opts(opts)
       end
 
       def name
